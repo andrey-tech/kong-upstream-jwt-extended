@@ -1,12 +1,19 @@
-local access = require "kong.plugins.kong-upstream-jwt.access"
+-- © Optum 2018
 
-local KongUpstreamJWTHandler = {}
+-- Changed © andrey-tech 2020
+local access = require "kong.plugins.kong-upstream-jwt-extended.access"
 
-function KongUpstreamJWTHandler:access(conf)
+-- Changed © andrey-tech 2020
+local KongUpstreamJWTExtendedHandler = {}
+
+-- Changed © andrey-tech 2020
+function KongUpstreamJWTExtendedHandler:access(conf)
   access.execute(conf)
 end
 
-KongUpstreamJWTHandler.PRIORITY = 999 -- This plugin needs to run after auth plugins so it has access to `ngx.ctx.authenticated_consumer`
-KongUpstreamJWTHandler.VERSION = "1.2"
+-- Changed © andrey-tech 2020
+KongUpstreamJWTExtendedHandler.PRIORITY = 999 -- This plugin needs to run after auth plugins for `kong.client.get_consumer(), kong.client.get_credential()`
+KongUpstreamJWTExtendedHandler.VERSION = "2.0"
 
-return KongUpstreamJWTHandler
+-- Changed © andrey-tech 2020
+return KongUpstreamJWTExtendedHandler
