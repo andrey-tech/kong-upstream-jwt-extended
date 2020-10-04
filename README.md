@@ -3,25 +3,28 @@
 ## Overview
 This plugin is a fork of [kong-upstream-jwt](https://github.com/Optum/kong-upstream-jwt) with **extended features**.
 
-This plugin will add a signed [JSON Web Token (JWT)](https://en.wikipedia.org/wiki/JSON_Web_Token) into the HTTP Header of proxied requests through the Kong gateway.
+This plugin will add a signed [JSON Web Token](https://en.wikipedia.org/wiki/JSON_Web_Token) (JWT)
+([RFC 7519](https://tools.ietf.org/html/rfc7519)) into the HTTP Header `Authorization` of proxied requests through the Kong gateway.
 The purpose of this, is to provide means of _Authentication_, _Authorization_ and _Non-Repudiation_ to API providers
 (APIs for which Kong is a gateway).
 
 In short, API Providers require a means of cryptographically validating that requests they receive were:
-A. proxied by Kong, and B. not tampered with during transmission from Kong -> API Provider.
+A. proxied by Kong, and B. not tampered with during transmission from Kong to API Provider.
 This token accomplishes both as follows:
 
 1. **Authentication** & **Authorization** - Provided by means of JWT signature validation.
-The API Provider will validate the signature on the JWT token (which is generating using Kong's RSA x509 private key),
-using Kong's public key. This public key can be maintained in a keystore, or sent with the token in the field `x5c` -
-provided API providers validate the signature chain against their truststore.
+The API Provider will validate the signature on the JWT token (which is generating using Kong's RSA private key),
+using Kong's [X.509 public key certificate](https://en.wikipedia.org/wiki/X.509).
+This X.509 public key certificate can be maintained in a keystore,
+or sent with the token in the field [`x5c`](https://tools.ietf.org/html/rfc7515#section-4.1.6)
+- provided API providers validate the signature chain against their truststore.
 
 2. **Non-Repudiation** - SHA256 is used to hash the body of the HTTP request and query string of the НТТР request URL,
-and the resulting digests are included in the `bodyhash` and `queryhash` elements of the field (claim) `kong` of JWT payload.
+and the resulting digests are included in the `bodyhash` and `queryhash` elements of the field `kong` of JWT payload.
 API Providers will take the SHA256 hashes of the HTTP request body and HTTP request query string,
 and compare the digests to that found in the JWT payload.
 If they are identical, the request remained intact during transmission.
-Also information about consumer, credential, route and service may be added to field (claim) `kong` of JWT payload.
+Also, information about consumer, credential, route and service may be added to field `kong` of JWT payload.
 
 ## Supported Kong Releases
 
@@ -45,12 +48,12 @@ $ luarocks make *.rockspec
 
 ### Header
 
-Field  |  Config parameter | Description
--------| ------------------ | ------------
-[typ](https://tools.ietf.org/html/rfc7515#section-4.1.9)   |           | Token type (JWT)
-[alg](https://tools.ietf.org/html/rfc7515#section-4.1.1)   |           | Message authentication code algorithm (RS256)
-[x5c](https://tools.ietf.org/html/rfc7515#section-4.1.6)   | x5c       | A X.509 certificate chain in [RFC4945](https://tools.ietf.org/html/rfc4945) format corresponding to the private key used to generate the token signature for use by API providers to validate the JWT
-[kid](https://tools.ietf.org/html/rfc7515#section-4.1.4)   | key id    | A hint indicating which key the client used to generate the token signature
+Field  | Configuration           | Description
+-------| ----------------------- | ------------
+[`typ`](https://tools.ietf.org/html/rfc7515#section-4.1.9)   |           | Token type (JWT)
+[`alg`](https://tools.ietf.org/html/rfc7515#section-4.1.1)   |           | Message authentication code algorithm (RS256)
+[`x5c`](https://tools.ietf.org/html/rfc7515#section-4.1.6)   | x5c       | A X.509 certificate chain in [RFC4945](https://tools.ietf.org/html/rfc4945) format corresponding to the private key used to generate the token signature for use by API providers to validate the JWT
+[`kid`](https://tools.ietf.org/html/rfc7515#section-4.1.4)   | key id    | A hint indicating which key the client used to generate the token signature
 
 The following is an example of the contents of the decoded JWT header:
 ```json
@@ -58,20 +61,20 @@ The following is an example of the contents of the decoded JWT header:
   "typ": "JWT",
   "alg": "RS256",
   "kid": "key-id-001",
-  "x5c": ["...der-encoded cert data..."]
+  "x5c": ["...X.509 public key certificate data..."]
 }
 ```
 
 ### Payload
 
-Field  |  Config parameter | Description
--------| ------------------ | ------------
-[aud](https://tools.ietf.org/html/rfc7519#section-4.1.3)   | aud      | Identifies the recipients that the JWT is intended for (Kong service name)
-[iss](https://tools.ietf.org/html/rfc7519#section-4.1.1)   | issuer   | Identifies principal that issued the JWT
-[iat](https://tools.ietf.org/html/rfc7519#section-4.1.6)   | iat      | Identifies the time at which the JWT was issued
-[jti](https://tools.ietf.org/html/rfc7519#section-4.1.7)   | jwt      | Case sensitive unique identifier of the token even among different issuers (unique to every request - [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier))
-[exp](https://tools.ietf.org/html/rfc7519#section-4.1.4)   | exp      | Identifies the expiration time on and after which the JWT must not be accepted for processing
-kong                                                       | consumer,<br> credential,<br> route,<br> service,<br> body hash,<br> query hash | Information about consumer, credential, route, service and request from Kong
+Field  | Configuration | Description
+-------| ------------- | ------------
+[`aud`](https://tools.ietf.org/html/rfc7519#section-4.1.3)   | aud      | Identifies the recipients that the JWT is intended for (Kong service name)
+[`iss`](https://tools.ietf.org/html/rfc7519#section-4.1.1)   | issuer   | Identifies principal that issued the JWT
+[`iat`](https://tools.ietf.org/html/rfc7519#section-4.1.6)   | iat      | Identifies the time at which the JWT was issued
+[`jti`](https://tools.ietf.org/html/rfc7519#section-4.1.7)   | jwt      | Case sensitive unique identifier of the token even among different issuers (unique to every request - [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier))
+[`exp`](https://tools.ietf.org/html/rfc7519#section-4.1.4)   | exp      | Identifies the expiration time on and after which the JWT must not be accepted for processing
+`kong`                                                       | consumer,<br> credential,<br> route,<br> service,<br> body hash,<br> query hash | Non [RFC 7519](https://tools.ietf.org/html/rfc7519) field with information about consumer, credential, route, service and request from Kong (object).
 
 The following is an example of the contents of the decoded JWT payload:
 ```json
@@ -107,30 +110,35 @@ The following is an example of the contents of the decoded JWT payload:
 
 ## Configuration
 
-Configuration parameter | Type    | Description
+Parameter               | Type    | Description
 ----------------------- | ------- | -----------
 issuer                  | string  | Identifies principal that issued the JWT (present in JWT payload if not blank)
-private key location<sup>*</sup>    | string  | The path to your Kong's private key file (.key) to sign the JWT
-public key location<sup>*</sup>     | string  | The path to your Kong's public key file (.crt)
+private key location    | string  | The path to your Kong's private key file (.key) to sign the JWT
+public key location     | string  | The path to your Kong's X.509 public key certificate file (.crt)
 key id                  | string  | A hint indicating which key the client used to generate the token signature. Present in JWT header if not blank
 header                  | string  | Key of НТТР header (Authorization)
 include bearer          | boolean | Controls "Bearer " + JWT or just JWT in header
-exp                     | integer | Controls expiration time of token (beetween 0 and 86400). If 0, then exp field is not present in JWT payload
-consumer                | array   | List of keys of **currently authenticated** consumer entity (use * to include all available keys)
-credential              | array   | List of keys of credentials of the **currently authenticated** consumer entity (use * to include all available keys)
-route                   | array   | List of keys of **current** route entity (use * to include all available keys)
-service                 | array   | List of keys of **current** service entity (use * to include all available keys)
-x5c                     | boolean | Controls x5c field in JWT header
-aud                     | boolean | Controls aud field in JWT payload
-iat                     | boolean | Controls iat field in JWT payload
-jti                     | boolean | Controls jti field in JWT payload
-body hash               | boolean | Controls bodyhash field in JWT payload
-query hash              | boolean | Controls queryhash field in JWT payload
+exp                     | integer | Controls expiration time of token (between 0 and 86400). If 0, then `exp` field is not present in JWT payload
+consumer                | array   | List of keys of **currently authenticated** consumer entity to show in kong.consumer object of JWT payload (use * to include all available keys)
+credential              | array   | List of keys of credentials of the **currently authenticated** consumer entity to show in kong.credentials object of JWT payload (use * to include all available keys)
+route                   | array   | List of keys of **current** route entity to show in kong.route object of JWT payload (use * to include all available keys)
+service                 | array   | List of keys of **current** service entity to show in kong.service object of JWT payload (use * to include all available keys)
+x5c                     | boolean | Controls `x5c` field in JWT header
+aud                     | boolean | Controls `aud` field in JWT payload
+iat                     | boolean | Controls `iat` field in JWT payload
+jti                     | boolean | Controls `jti` field in JWT payload
+body hash               | boolean | Controls `bodyhash` field in kong.request object of JWT payload
+query hash              | boolean | Controls `queryhash` field in kong.request object of JWT payload
 
-**\*** The plugin **requires** that Kong’s private key be accessible in order to sign the JWT.
-Also X.509 cert may be included in the [x5c](https://tools.ietf.org/html/rfc7515#section-4.1.6) JWT header for use by API providers to validate the JWT.
+## Private and Public Keys
 
-To maintain backwards compatibility, support for passing the key locations through environment variables is also available.  We access these via Kong's overriding environment variables `KONG_SSL_CERT_KEY` for the private key as well as `KONG_SSL_CERT_DER` for the public key.
+The plugin **requires** that Kong's private key be accessible in order to sign the JWT (configuration parameter "private key location").
+X.509 public key certificate may be included in the [x5c](https://tools.ietf.org/html/rfc7515#section-4.1.6) JWT header for use by API providers to validate the JWT (configuration parameter "public key location").
+
+#### Backwards Compatibility
+
+To maintain backwards compatibility, support for passing the key locations through environment variables is also available.
+We access these via Kong's overriding environment variables `KONG_SSL_CERT_KEY` for the private key as well as `KONG_SSL_CERT_DER` for the X.509 public key certificate.
 
 If not already set, these can be done so as follows:
 ```
@@ -138,13 +146,30 @@ $ export KONG_SSL_CERT_KEY="/path/to/kong/ssl/private.key"
 $ export KONG_SSL_CERT_DER="/path/to/kong/ssl/public.crt"
 ```
 
-One last step is to make the environment variables accessible by an nginx worker. To do this, simply add these line to your _nginx.conf_
+One last step is to make the environment variables accessible by an nginx worker.
+To do this, simply add these line to your _nginx.conf_.
 ```
 env KONG_SSL_CERT_KEY;
 env KONG_SSL_CERT_DER;
 ```
 
-## Authors and maintainers
+#### Create Key Files with OpenSSL
+
+The basics command line to generate a private key and X.509 public key certificate
+using [OpenSSL](https://www.openssl.org) in one command:
+
+```
+openssl req -x509 -newkey rsa:2048 -keyout private.key -out public.crt -days 365 -nodes
+```
+
+It generates:
+
+1. 2048 bits **unprotected** by passphrase private key in file _private.key_ in PEM format.
+2. Self-signed X.509 public key certificate with an expiration of 365 days in file _public.crt_ in PEM format.
+Self-signed certificates are **not validated** with any third party.
+If you need more security, you should use a certificate signed by a [certificate authority](https://en.wikipedia.org/wiki/Certificate_authority) (CA).
+
+## Authors and Maintainers
 
 The original authors and maintainers of [kong-upstream-jwt](https://github.com/Optum/kong-upstream-jwt) plugin:
 
