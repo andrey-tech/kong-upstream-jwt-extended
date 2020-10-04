@@ -203,12 +203,18 @@ local function build_jwt_payload(conf)
 
   -- Changed © andrey-tech 2020
   if conf.body_hash then
-    payload.kong.bodyhash = build_body_hash()
+    if not payload.kong.request then
+        payload.kong.request = {}
+    end
+    payload.kong.request.bodyhash = build_body_hash()
   end
 
   -- Added © andrey-tech 2020
   if conf.query_hash then
-    payload.kong.queryhash = build_query_hash()
+    if not payload.kong.request then
+        payload.kong.request = {}
+    end
+    payload.kong.request.queryhash = build_query_hash()
   end
 
   -- Added © andrey-tech © 2020

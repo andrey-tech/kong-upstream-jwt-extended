@@ -1,23 +1,35 @@
-# Kong Upstream JWT Plugin
-## Overview
-This plugin will add a signed JWT into the HTTP Header `JWT` or `config.header` of proxied requests through the Kong gateway. The purpose of this, is to provide means of _Authentication_, _Authorization_ and _Non-Repudiation_ to API providers (APIs for which Kong is a gateway).
+# Kong Upstream JWT Extended Plugin
 
-In short, API Providers need a means of cryptographically validating that requests they receive were A. proxied by Kong, and B. not tampered with during transmission from Kong -> API Provider. This token accomplishes both as follows:
-1. **Authentication** & **Authorization** - Provided by means of JWT signature validation. The API Provider will validate the signature on the JWT token (which is generating using Kong's RSA x509 private key), using Kong's public key. This public key can be maintained in a keystore, or sent with the token - provided API providers validate the signature chain against their truststore.
-2. **Non-Repudiation** - SHA256 is used to hash the body of the HTTP Request Body, and the resulting digest is included in the `payloadhash` element of the JWT body. API Providers will take the SHA256 hash of the HTTP Request Body, and compare the digest to that found in the JWT. If they are identical, the request remained intact during transmission.
+## Overview
+This plugin is a fork of [kong-upstream-jwt](https://github.com/Optum/kong-upstream-jwt) with extended features.
+
+This plugin will add a signed [JSON Web Token (JWT)](https://en.wikipedia.org/wiki/JSON_Web_Token) into the HTTP Header of proxied requests through the Kong gateway.
+The purpose of this, is to provide means of _Authentication_, _Authorization_ and _Non-Repudiation_ to API providers
+(APIs for which Kong is a gateway).
+
+In short, API Providers require a means of cryptographically validating that requests they receive were:
+A. proxied by Kong, and B. not tampered with during transmission from Kong -> API Provider.
+This token accomplishes both as follows:
+
+1. **Authentication** & **Authorization** - Provided by means of JWT signature validation. The API Provider will validate the signature on the JWT token (which is generating using Kong's RSA x509 private key), using Kong's public key. This public key can be maintained in a keystore, or sent with the token in the field `x5c` - provided API providers validate the signature chain against their truststore.
+
+2. **Non-Repudiation** - SHA256 is used to hash the body of the HTTP request and query string of the НТТР request URL, and the resulting digests are included in the `bodyhash` and `queryhash` elements of the field (claim) `kong` of JWT payload. API Providers will take the SHA256 hashes of the HTTP request body and HTTP request query string, and compare the digests to that found in the JWT payload. If they are identical, the request remained intact during transmission. Also information about consumer, credential, route and service may be added to field (claim) `kong` of JWT payload.
 
 ## Supported Kong Releases
-Kong >= 1.0.x 
+
+- Kong >= 1.0.x 
 
 ## Installation
+
 Recommended:
 ```
-$ luarocks install kong-upstream-jwt
+$ luarocks install kong-upstream-jwt-extended
 ```
+
 Other:
 ```
-$ git clone https://github.com/Optum/kong-upstream-jwt.git /path/to/kong/plugins/kong-upstream-jwt
-$ cd /path/to/kong/plugins/kong-upstream-jwt
+$ git clone https://github.com/andrey-tech/kong-upstream-jwt-extended.git /path/to/kong/plugins/kong-upstream-jwt
+$ cd /path/to/kong/plugins/kong-upstream-jwt-extended
 $ luarocks make *.rockspec
 ```
 
@@ -35,16 +47,32 @@ The following is an example of the contents of the decoded JWT token:
 ```
 
 **Payload:**
-```json
+```js
 {
-  "aud": "kong-service-name", // The Kong Service Name
-  "iss": "issuer", // Only set if issuer configuration variable available
-  "iat": 1550258274, // Only set if issuer configuration variable available
-  "exp": 1550258334, // 1 minute exp time
+  "aud": "Service-1", // (Audience) Only set if aud enabled in configuration (Kong service name)
+  "iss": "issuer", // (Issuer) Only set if issuer configuration variable is not blank
+  "iat": 1550258274, // (Issued at) Only set if iat enabled in configuration 
+  "exp": 1550258334, // 60 seconds exp time
   "jti": "d4f10edb-c4f0-47d3-b7e0-90a30a885a0b", // Unique to every request - UUID
-  "consumername": "consumer-username", // Consumer Username
-  "consumerid": "consumer-id", // Consumer ID
-  "payloadhash": "...sha256 hash of request payload..."
+  "kong": {
+    "bodyhash": "...SHA256 hash of request body...",
+    "queryhash": "...SHA256 hash of request query string...",
+    "consumer": {
+      "username": "Company A"
+      "id": "e96dcb71-4322-490d-b6c6-b9ba1a24b6e3",
+    },
+    "credential": {
+      "key": "q2QiVe24S6ABaO2L9dEA9y1epX25B9gr"
+    },
+    "route": {
+      "name": "Route-1",
+      "id": "cc04e82e-8b20-40f0-9081-830caa4cf13e"
+    },
+    "service": {
+      "id": "d0395ad5-9e53-47c4-a5f2-a4c3c5250c8a",
+      "name": "Service-1"
+    }
+  }
 }
 ```
 
