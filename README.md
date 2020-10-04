@@ -1,5 +1,7 @@
 # Kong Upstream JWT Extended Plugin
 
+![Kong logo](./assets/kong-logo.png)  
+
 ## Overview
 This plugin is a fork of [kong-upstream-jwt](https://github.com/Optum/kong-upstream-jwt) with **extended features**.
 
@@ -13,18 +15,18 @@ A. proxied by Kong, and B. not tampered with during transmission from Kong to AP
 This token accomplishes both as follows:
 
 1. **Authentication** & **Authorization** - Provided by means of JWT signature validation.
-The API Provider will validate the signature on the JWT token (which is generating using Kong's RSA private key),
+The API Provider will validate the signature on the JWT token (which is generated using Kong's RSA private key),
 using Kong's [X.509 public key certificate](https://en.wikipedia.org/wiki/X.509).
 This X.509 public key certificate can be maintained in a keystore,
 or sent with the token in the field [`x5c`](https://tools.ietf.org/html/rfc7515#section-4.1.6)
 - provided API providers validate the signature chain against their truststore.
 
-2. **Non-Repudiation** - SHA256 is used to hash the body of the HTTP request and query string of the НТТР request URL,
-and the resulting digests are included in the `bodyhash` and `queryhash` elements of the field `kong` of JWT payload.
-API Providers will take the SHA256 hashes of the HTTP request body and HTTP request query string,
-and compare the digests to that found in the JWT payload.
-If they are identical, the request remained intact during transmission.
-Also, information about consumer, credential, route and service may be added to field `kong` of JWT payload.
+2. **Non-Repudiation** - SHA256 is used to hash the body of the HTTP request and query string of the НТТР request URL.
+The resulting digests are included in the `bodyhash` and `queryhash` elements of the field `kong` of JWT payload.
+API Providers will take the SHA256 hashes of the HTTP request body and HTTP request URL query string
+to compare the digests to that found in the JWT payload.
+If they are identical, the request remaines intact during transmission.
+Also, information about consumer, credential, route and service can be added to field `kong` of JWT payload.
 
 ## Supported Kong Releases
 
@@ -133,7 +135,7 @@ query hash              | boolean | Controls `queryhash` field in kong.request o
 ## Private and Public Keys
 
 The plugin **requires** that Kong's private key be accessible in order to sign the JWT (configuration parameter "private key location").
-X.509 public key certificate may be included in the [x5c](https://tools.ietf.org/html/rfc7515#section-4.1.6) JWT header for use by API providers to validate the JWT (configuration parameter "public key location").
+X.509 public key certificate can be included in the [x5c](https://tools.ietf.org/html/rfc7515#section-4.1.6) JWT header for use by API providers to validate the JWT (configuration parameter "public key location").
 
 #### Backwards Compatibility
 
@@ -168,6 +170,28 @@ It generates:
 2. Self-signed X.509 public key certificate with an expiration of 365 days in file _public.crt_ in PEM format.
 Self-signed certificates are **not validated** with any third party.
 If you need more security, you should use a certificate signed by a [certificate authority](https://en.wikipedia.org/wiki/Certificate_authority) (CA).
+
+## Plugin Schema Configuration
+
+```
+issuer = "Issuer"
+private_key_location = "/home/kong/ssl/private.key"
+public_key_location = "/home/kong/ssl/public.crt"
+key_id = "keyId"
+header = "Authorization"
+include_bearer = true
+exp = 60
+consumer = { "id", "name" }
+credential = { "key" }
+route = { "id", "name" }
+service = { "id", "name" }
+x5c = false
+aud = false
+iat = false                
+jti = false
+body_hash = false
+query_hash = false
+```
 
 ## Authors and Maintainers
 
