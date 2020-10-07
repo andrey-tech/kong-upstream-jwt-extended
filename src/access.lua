@@ -97,7 +97,7 @@ end
 local function build_query_hash()
   local req_query  = kong.request.get_raw_query()
   local query_digest = ""
-  if req_query then
+  if req_query and req_query ~= "" then
     local sha256 = resty_sha256:new()
     sha256:update(req_query)
     query_digest = sha256:final()

@@ -1,5 +1,5 @@
 package = "kong-upstream-jwt-extended"
-version = "2.1.0-1"
+version = "2.1.1-1"
 source = {
    url = "git+https://github.com/andrey-tech/kong-upstream-jwt-extended.git"
 }
