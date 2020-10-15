@@ -13,7 +13,7 @@ end
 
 -- Changed © andrey-tech 2020
 KongUpstreamJWTExtendedHandler.PRIORITY = 999 -- This plugin needs to run after auth plugins for `kong.client.get_consumer(), kong.client.get_credential()`
-KongUpstreamJWTExtendedHandler.VERSION = "2.1.2"
+KongUpstreamJWTExtendedHandler.VERSION = "2.1.1"
 
 -- Changed © andrey-tech 2020
 return KongUpstreamJWTExtendedHandler
