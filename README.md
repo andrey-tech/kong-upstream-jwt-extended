@@ -100,7 +100,7 @@ The following is an example of the contents of the decoded JWT payload:
       "username": "Company A",
       "id": "e96dcb71-4322-490d-b6c6-b9ba1a24b6e3"
     },
-    "credential": {
+    "credentials": {
       "key": "q2QiVe24S6ABaO2L9dEA9y1epX25B9gr"
     },
     "route": {
@@ -131,7 +131,7 @@ header                  | string  | Key of НТТР header (Authorization)
 include bearer          | boolean | Controls "Bearer " + JWT or just JWT in header
 exp                     | integer | Controls expiration time of token (between 0 and 86400). If 0, then `exp` field is not present in JWT payload
 consumer                | array   | List of keys of **currently authenticated** consumer entity to show in kong.consumer object of JWT payload (use * to include all available keys)
-credential              | array   | List of keys of credentials of the **currently authenticated** consumer entity to show in kong.credentials object of JWT payload (use * to include all available keys)
+credentials             | array   | List of keys of credentials of the **currently authenticated** consumer entity to show in kong.credentials object of JWT payload (use * to include all available keys)
 route                   | array   | List of keys of **current** route entity to show in kong.route object of JWT payload (use * to include all available keys)
 service                 | array   | List of keys of **current** service entity to show in kong.service object of JWT payload (use * to include all available keys)
 x5c                     | boolean | Controls `x5c` field in JWT header
@@ -177,7 +177,8 @@ It generates:
 
 1. 2048 bits **unprotected** by passphrase private key in file _private.key_ in PEM format.
 2. Self-signed X.509 public key certificate with an expiration of 365 days in file _public.crt_ in PEM format.
-Self-signed certificates are **not validated** with any third party.
+
+⚠ Self-signed certificates are **not validated** with any third party.
 If you need more security, you should use a certificate signed by a [certificate authority](https://en.wikipedia.org/wiki/Certificate_authority) (CA).
 
 ## Plugin Schema Configuration
@@ -191,7 +192,7 @@ header = "Authorization"
 include_bearer = true
 exp = 60
 consumer = { "id", "name" }
-credential = { "key" }
+credentials = { "key" }
 route = { "id", "name" }
 service = { "id", "name" }
 x5c = false
@@ -320,7 +321,7 @@ $ luarocks make *.rockspec
       "username": "Company A",
       "id": "e96dcb71-4322-490d-b6c6-b9ba1a24b6e3"
     },
-    "credential": {
+    "credentials": {
       "key": "q2QiVe24S6ABaO2L9dEA9y1epX25B9gr"
     },
     "route": {
@@ -350,7 +351,7 @@ header                  | string  | Имя НТТР-заголовка (`Authori
 include bearer          | boolean | Управляет добавлением строки `Bearer ` к токену в HTTP-заголовке `Authorization`
 exp                     | integer | Время истечения токена в интервале между 0 и 86400 (присутствует в полезной нагрузке токена, если не 0)
 consumer                | array   | Список ключей **аутентифицированного** потребителя (consumer), включаемых в объект kong.consumer в полезной нагрузке токена (если `*`, то включаются все доступные ключи)
-credential              | array   | Список ключей полномочий (credentials) **аутентифицированного** потребителя (consumer), включаемых в объект kong.credential в полезной нагрузке токена (если `*`, то включаются все доступные ключи)
+credentials             | array   | Список ключей полномочий (credentials) **аутентифицированного** потребителя (consumer), включаемых в объект kong.credential в полезной нагрузке токена (если `*`, то включаются все доступные ключи)
 route                   | array   | Список ключей **текущего** маршрута (route), включаемых в объект kong.route в полезной нагрузке токена (если `*`, то включаются все доступные ключи)
 service                 | array   | Список ключей **текущего** сервиса (service), включаемых в объект kong.service в полезной нагрузке токена (если `*`, то включаются все доступные ключи)
 x5c                     | boolean | Управляет включением поля `x5c` в заголовок токена
@@ -418,7 +419,7 @@ header = "Authorization"
 include_bearer = true
 exp = 60
 consumer = { "id", "name" }
-credential = { "key" }
+credentials = { "key" }
 route = { "id", "name" }
 service = { "id", "name" }
 x5c = false
