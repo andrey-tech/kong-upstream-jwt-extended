@@ -21,7 +21,7 @@ return {
                 -- Added © andrey-tech 2020
                 { exp = { type = "number", default = 60, between = { 0, 86400 }  }, },
                 { consumer = { type = "array", elements = { type = "string" }, required = false }, },
-                { credential = { type = "array", elements = { type = "string" }, required = false }, },
+                { credentials = { type = "array", elements = { type = "string" }, required = false }, },
                 { route = { type = "array", elements = { type = "string" }, required = false }, },
                 { service = { type = "array", elements = { type = "string" }, required = false }, },
                 { x5c = { type = "boolean", default = false }, },
