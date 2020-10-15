@@ -29,7 +29,7 @@ The resulting digests are included in the `bodyhash` and `queryhash` elements of
 API Providers will take the SHA256 hashes of the HTTP request body and HTTP request URL query string
 to compare the digests to that found in the JWT payload.
 If they are identical, the request remaines intact during transmission.
-Also, information about consumer, credential, route and service can be added to field `kong` of JWT payload.
+Also, information about consumer, credentials, route and service can be added to field `kong` of JWT payload.
 
 ## Supported Kong Releases
 
@@ -81,7 +81,7 @@ Field  | Configuration | Description
 [`iat`](https://tools.ietf.org/html/rfc7519#section-4.1.6)   | iat      | Identifies the time at which the JWT was issued
 [`jti`](https://tools.ietf.org/html/rfc7519#section-4.1.7)   | jwt      | Case sensitive unique identifier of the token even among different issuers (unique to every request - [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier))
 [`exp`](https://tools.ietf.org/html/rfc7519#section-4.1.4)   | exp      | Identifies the expiration time on and after which the JWT must not be accepted for processing
-`kong`                                                       | consumer,<br> credential,<br> route,<br> service,<br> body hash,<br> query hash | Non [RFC 7519](https://tools.ietf.org/html/rfc7519) field with information about consumer, credential, route, service and request from Kong (object).
+`kong`                                                       | consumer,<br> credentials,<br> route,<br> service,<br> body hash,<br> query hash | Non [RFC 7519](https://tools.ietf.org/html/rfc7519) field with information about consumer, credentials, route, service and request from Kong (object).
 
 The following is an example of the contents of the decoded JWT payload:
 ```json
@@ -251,7 +251,7 @@ This plugin is licensed under the [Apache License Version 2.0](./LICENSE).
     при передаче от шлюза Kong к API.
 
     Кроме того информация о следующих объектах (сущностях) шлюза Kong может быть включена в поле `kong` полезной
-    нагрузки токена: consumer, credential, route и service.
+    нагрузки токена: consumer, credentials, route и service.
 
 ## Поддерживаемые релизы Kong
 
@@ -302,7 +302,7 @@ $ luarocks make *.rockspec
 [`iat`](https://tools.ietf.org/html/rfc7519#section-4.1.6)   | iat      | Время создания токена в формате [Unix time](https://ru.wikipedia.org/wiki/Unix-%D0%B2%D1%80%D0%B5%D0%BC%D1%8F)
 [`jti`](https://tools.ietf.org/html/rfc7519#section-4.1.7)   | jwt      | Уникальный идентификатор токена ([UUID](https://ru.wikipedia.org/wiki/UUID))
 [`exp`](https://tools.ietf.org/html/rfc7519#section-4.1.4)   | exp      | Время когда токен станет недействительным в формате [Unix time](https://ru.wikipedia.org/wiki/Unix-%D0%B2%D1%80%D0%B5%D0%BC%D1%8F)
-`kong`                                                       | consumer,<br> credential,<br> route,<br> service,<br> body hash,<br> query hash | Поле с информацией об объектах Kong и запросе (объект)
+`kong`                                                       | consumer,<br> credentials,<br> route,<br> service,<br> body hash,<br> query hash | Поле с информацией об объектах Kong и запросе (объект)
 
 Пример декодированной полезной нагрузки токена:
 ```json
@@ -351,7 +351,7 @@ header                  | string  | Имя НТТР-заголовка (`Authori
 include bearer          | boolean | Управляет добавлением строки `Bearer ` к токену в HTTP-заголовке `Authorization`
 exp                     | integer | Время истечения токена в интервале между 0 и 86400 (присутствует в полезной нагрузке токена, если не 0)
 consumer                | array   | Список ключей **аутентифицированного** потребителя (consumer), включаемых в объект kong.consumer в полезной нагрузке токена (если `*`, то включаются все доступные ключи)
-credentials             | array   | Список ключей полномочий (credentials) **аутентифицированного** потребителя (consumer), включаемых в объект kong.credential в полезной нагрузке токена (если `*`, то включаются все доступные ключи)
+credentials             | array   | Список ключей полномочий (credentials) **аутентифицированного** потребителя (consumer), включаемых в объект kong.credentials в полезной нагрузке токена (если `*`, то включаются все доступные ключи)
 route                   | array   | Список ключей **текущего** маршрута (route), включаемых в объект kong.route в полезной нагрузке токена (если `*`, то включаются все доступные ключи)
 service                 | array   | Список ключей **текущего** сервиса (service), включаемых в объект kong.service в полезной нагрузке токена (если `*`, то включаются все доступные ключи)
 x5c                     | boolean | Управляет включением поля `x5c` в заголовок токена
