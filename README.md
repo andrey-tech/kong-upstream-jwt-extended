@@ -8,8 +8,8 @@
 
 This plugin is a fork of [kong-upstream-jwt](https://github.com/Optum/kong-upstream-jwt) and **extends its features**.
 
-This plugin will add a signed (RS256 algorithm) [JSON Web Token](https://en.wikipedia.org/wiki/JSON_Web_Token) (JWT)
-into the HTTP Header `Authorization` of proxied requests through the Kong gateway.
+This plugin will add a signed [JSON Web Token](https://en.wikipedia.org/wiki/JSON_Web_Token) (JWT)
+into the HTTP Header `Authorization` of proxied requests through the [Kong Gateway](https://konghq.com).
 The purpose of this, is to provide means of _Authentication_, _Authorization_ and _Non-Repudiation_ to API providers
 (APIs for which Kong is a gateway).
 
@@ -17,7 +17,7 @@ In short, API Providers require a means of cryptographically validating that req
 A. proxied by Kong, and B. not tampered with during transmission from Kong to API Provider.
 This token accomplishes both as follows:
 
-1. **Authentication** & **Authorization** - Provided by means of JWT signature validation.
+1. **Authentication** & **Authorization** - Provided by means of JWT signature validation using RS256 algorithm.
 The API Provider will validate the signature on the JWT token (which is generated using Kong's RSA private key),
 using Kong's [X.509 public key certificate](https://en.wikipedia.org/wiki/X.509).
 This X.509 public key certificate can be maintained in a keystore,
@@ -130,16 +130,20 @@ key id                  | string  | A hint indicating which key the client used 
 header                  | string  | Key of НТТР header (Authorization)
 include bearer          | boolean | Controls "Bearer " + JWT or just JWT in header
 exp                     | integer | Controls expiration time of token (between 0 and 86400). If 0, then `exp` field is not present in JWT payload
-consumer                | array   | List of keys of **currently authenticated** consumer entity to show in kong.consumer object of JWT payload (use * to include all available keys)
-credentials             | array   | List of keys of credentials of the **currently authenticated** consumer entity to show in kong.credentials object of JWT payload (use * to include all available keys)
-route                   | array   | List of keys of **current** route entity to show in kong.route object of JWT payload (use * to include all available keys)
-service                 | array   | List of keys of **current** service entity to show in kong.service object of JWT payload (use * to include all available keys)
+consumer                | array   | List of keys of **currently authenticated** consumer entity to show in kong.consumer object of JWT payload **<sup>*</sup>**
+credentials             | array   | List of keys of credentials of the **currently authenticated** consumer entity to show in kong.credentials object of JWT payload **<sup>*</sup>**
+route                   | array   | List of keys of **current** route entity to show in kong.route object of JWT payload **<sup>*</sup>**
+service                 | array   | List of keys of **current** service entity to show in kong.service object of JWT payload **<sup>*</sup>**
 x5c                     | boolean | Controls `x5c` field in JWT header
 aud                     | boolean | Controls `aud` field in JWT payload
 iat                     | boolean | Controls `iat` field in JWT payload
 jti                     | boolean | Controls `jti` field in JWT payload
 body hash               | boolean | Controls `bodyhash` field in kong.request object of JWT payload
 query hash              | boolean | Controls `queryhash` field in kong.request object of JWT payload
+
+Notes:
+
+**<sup>*</sup>** Use `*` to include all available keys.
 
 ## Private and Public RSA Keys
 
@@ -226,8 +230,8 @@ This plugin is licensed under the [Apache License Version 2.0](./LICENSE).
 
 Данный плагин является форком плагина [kong-upstream-jwt](https://github.com/Optum/kong-upstream-jwt) и **расширяет его возможности**.
 
-Плагин добавляет подписанный с помощью алгоритма RS256 токен типа [JSON Web Token](https://ru.wikipedia.org/wiki/JSON_Web_Token) (JWT)
-([RFC 7519](https://tools.ietf.org/html/rfc7519)) в заголовок `Authorization` НТТР-запросов, прошедших через шлюз Kong,
+Плагин добавляет подписанный токен типа [JSON Web Token](https://ru.wikipedia.org/wiki/JSON_Web_Token) (JWT)
+([RFC 7519](https://tools.ietf.org/html/rfc7519)) в заголовок `Authorization` НТТР-запросов, прошедших через шлюз [Kong Gateway](https://konghq.com),
 в целях обеспечения аутентификации, авторизации и удостоверения подлинности и неоспоримости данных,
 передаваемых в HTTP-запросе от шлюза Kong к API.
 
@@ -236,7 +240,7 @@ This plugin is licensed under the [Apache License Version 2.0](./LICENSE).
 
 Формируемый токен JWT позволяет выполнить обе эти проверки:
 
-1. **Аутентификация** и **авторизация**. Обеспечивается посредством проверки подписи токена.
+1. **Аутентификация** и **авторизация**. Обеспечивается посредством проверки подписи токена с помощью алгоритма RS256.
     API может проверить подпись токена, которая была создана с использованием закрытого RSA-ключа шлюза Kong,
     при помощи [сертификата открытого ключа X.509](https://en.wikipedia.org/wiki/X.509).
     Сертификат открытого ключа X.509 шлюза Kong может храниться в хранилище ключей, доступном API,
@@ -350,10 +354,10 @@ key id                  | string  | Указывает какой именно �
 header                  | string  | Имя НТТР-заголовка (`Authorization`) токена
 include bearer          | boolean | Управляет добавлением строки `Bearer ` к токену в HTTP-заголовке `Authorization`
 exp                     | integer | Время истечения токена в интервале между 0 и 86400 (присутствует в полезной нагрузке токена, если не 0)
-consumer                | array   | Список ключей **аутентифицированного** потребителя (consumer), включаемых в объект kong.consumer в полезной нагрузке токена (если `*`, то включаются все доступные ключи)
-credentials             | array   | Список ключей полномочий (credentials) **аутентифицированного** потребителя (consumer), включаемых в объект kong.credentials в полезной нагрузке токена (если `*`, то включаются все доступные ключи)
-route                   | array   | Список ключей **текущего** маршрута (route), включаемых в объект kong.route в полезной нагрузке токена (если `*`, то включаются все доступные ключи)
-service                 | array   | Список ключей **текущего** сервиса (service), включаемых в объект kong.service в полезной нагрузке токена (если `*`, то включаются все доступные ключи)
+consumer                | array   | Список ключей **аутентифицированного** потребителя (consumer), включаемых в объект kong.consumer в полезной нагрузке токена **<sup>*</sup>**
+credentials             | array   | Список ключей полномочий (credentials) **аутентифицированного** потребителя (consumer), включаемых в объект kong.credentials в полезной нагрузке токена **<sup>*</sup>**
+route                   | array   | Список ключей **текущего** маршрута (route), включаемых в объект kong.route в полезной нагрузке токена **<sup>*</sup>**
+service                 | array   | Список ключей **текущего** сервиса (service), включаемых в объект kong.service в полезной нагрузке токена **<sup>*</sup>**
 x5c                     | boolean | Управляет включением поля `x5c` в заголовок токена
 aud                     | boolean | Управляет включением поля `aud` в полезную нагрузку токена
 iat                     | boolean | Управляет включением поля `iat` в полезную нагрузку токена
@@ -361,6 +365,10 @@ jti                     | boolean | Управляет включением по
 body hash               | boolean | Управляет включением поля `bodyhash` в объект kong.request в полезной нагрузке токена
 query hash              | boolean | Управляет включением поля `queryhash` в объект kong.request в полезной нагрузке токена
 
+Примечания:
+
+**<sup>*</sup>** Если список содержит `*`, то включаются все доступные ключи. Если список пуст,
+то параметр не включается в полезную нагрузку токена.
 
 ## Закрытый и публичный ключи
 
