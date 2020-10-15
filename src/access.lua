@@ -95,6 +95,9 @@ end
 -- Added © andrey-tech 2020
 -- @return SHA-256 hash of the request query data
 local function build_query_hash()
+  -- Returns the query component of the request's URL.
+  -- It is not normalized in any way (not even URL-decoding of special characters)
+  -- and does not include the leading ? character.
   local req_query  = kong.request.get_raw_query()
   local query_digest = ""
   if req_query and req_query ~= "" then
@@ -234,16 +237,16 @@ local function build_jwt_payload(conf)
   end
 
   -- Added © andrey-tech © 2020
-  if conf.credential and #conf.credential > 0 then
-    payload.kong.credential = {}
+  if conf.credentials and #conf.credentials > 0 then
+    payload.kong.credentials = {}
     -- Returns the credentials of the currently authenticated consumer. If not set yet, it returns nil
-    local credential = kong.client.get_credential()
-    if credential then
-      if has_value(conf.credential, "*") then
-        payload.kong.credential = credential
+    local credentials = kong.client.get_credential()
+    if credentials then
+      if has_value(conf.credentials, "*") then
+        payload.kong.credentials = credentials
       else
-        for _, key in ipairs(conf.credential) do
-          payload.kong.credential[key] = credential[key]
+        for _, key in ipairs(conf.credentials) do
+          payload.kong.credentials[key] = credentials[key]
         end
       end
     end
