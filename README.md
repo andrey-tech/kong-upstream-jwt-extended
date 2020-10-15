@@ -22,7 +22,7 @@ The API Provider will validate the signature on the JWT token (which is generate
 using Kong's [X.509 public key certificate](https://en.wikipedia.org/wiki/X.509).
 This X.509 public key certificate can be maintained in a keystore,
 or sent with the token in the field [`x5c`](https://tools.ietf.org/html/rfc7515#section-4.1.6)
-- provided API providers validate the signature chain against their truststore.
+provided API providers validate the signature chain against their truststore.
 
 2. **Non-Repudiation** - SHA256 is used to hash the body of the HTTP request and query string of the НТТР request URL.
 The resulting digests are included in the `bodyhash` and `queryhash` elements of the field `kong` of JWT payload.
